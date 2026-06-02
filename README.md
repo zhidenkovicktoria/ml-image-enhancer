@@ -3,7 +3,7 @@
 Автоматическое улучшение изображений (яркость, контраст, насыщенность) с помощью нейросети.  
 **Модель работает прямо в вашем браузере** (TensorFlow.js). Никакого бэкенда, ничего не нужно устанавливать.
 
-🔗 **Демо:** [https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/](https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/)
+🔗 **Демо:** [https://zhidenkovicktoria.github.io/ml-image-enhancer/](https://zhidenkovicktoria.github.io/ml-image-enhancer/)
 
 📦 **Скачать архив проекта:** [ZIP](https://github.com/zhidenkovicktoria/ml-image-enhancer/archive/refs/heads/main.zip)
 
@@ -30,7 +30,7 @@
 ## 🚀 Демонстрация (без установки)
 
 Просто перейдите по ссылке:  
-[https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/](https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/)
+[https://zhidenkovicktoria.github.io/ml-image-enhancer/](https://zhidenkovicktoria.github.io/ml-image-enhancer/)
 
 1. Дождитесь загрузки модели (кнопка активируется).
 2. Загрузите изображение (JPG, PNG, BMP, HEIC).
