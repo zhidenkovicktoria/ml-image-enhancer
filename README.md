@@ -1,90 +1,83 @@
 # ML Image Enhancer
 
 Автоматическое улучшение изображений (яркость, контраст, насыщенность) с помощью нейросети.  
-Проект выполнен в рамках лабораторной работы.
+**Модель работает прямо в вашем браузере** (TensorFlow.js). Никакого бэкенда, ничего не нужно устанавливать.
 
-## 📦 Скачать проект архивом
+🔗 **Демо:** [https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/](https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/)
 
-[Скачать ZIP-архив репозитория](https://github.com/zhidenkovicktoria/ml-image-enhancer/archive/refs/heads/main.zip)
+📦 **Скачать архив проекта:** [ZIP](https://github.com/zhidenkovicktoria/ml-image-enhancer/archive/refs/heads/main.zip)
 
-## 🎯 Требования 
+---
+
+## 🎯 Выполненные требования
 
 | Требование | Статус |
 |------------|--------|
+| ML-модель в браузере пользователя | ✅ |
+| Улучшение яркости, контраста, цветности | ✅ |
 | Работа во всех браузерах | ✅ |
-| Объём кода ≤10 МБ (клиент) | ✅ |
+| Объём клиентского кода ≤10 МБ | ✅ |
 | Обработка до 15 Мп | ✅ |
-| Время обработки ≤30 с | ✅ |
+| Время обработки ≤30 с (обычно 2–5 с) | ✅ |
 | Форматы JPG, PNG, BMP, HEIC | ✅ |
 | Асинхронность (не блокирует UI) | ✅ |
-| API: create, status, abort, get result | ✅ |
+| API-методы (create, status, abort, result) | ✅ (эмуляция на клиенте) |
 | События статуса / прогресс | ✅ |
 | ML подбирает параметры | ✅ |
 
-## 🖥️ Демонстрация
+---
 
-**Фронтенд (статическая демо-версия):**  
-🔗 [https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/](https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/)  
+## 🚀 Демонстрация (без установки)
 
-*Для работы требуется запущенный бэкенд (см. инструкцию ниже). Без бэкенда кнопки не будут обрабатывать изображения.*
+Просто перейдите по ссылке:  
+[https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/](https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/)
 
-## 📦 Установка и запуск (локально)
+1. Дождитесь загрузки модели (кнопка активируется).
+2. Загрузите изображение (JPG, PNG, BMP, HEIC).
+3. Нажмите «Запустить улучшение».
+4. Получите результат и скачайте его.
 
-### Требования
-- Python 3.11+
-- Установленные зависимости из `backend/requirements.txt`
+---
 
-### 1. Клонируйте репозиторий
+## 📁 Структура репозитория 
 ```bash
-git clone https://github.com/zhidenkovicktoria/ml-image-enhancer.git
-cd ml-image-enhancer
+ml-image-enhancer/
+├── frontend/
+│ ├── index.html # главный интерфейс (TensorFlow.js)
+│ └── tfjs_model/ # конвертированная модель
+│ ├── model.json
+│ └── *.bin # файлы весов
+├── samples/ # тестовые изображения
+└── README.md
 ```
-### 2. Запустите бэкенд
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-Сервер будет доступен по адресу http://localhost:8000
-Документация API: http://localhost:8000/docs
 
-### 3. Откройте фронтенд
-Откройте файл `frontend/index.html` в браузере или запустите простой HTTP сервер:
+## 🧪 Локальное тестирование (опционально)
+
+Если вы хотите запустить копию на своём компьютере без интернета:
 
 ```bash
 cd frontend
 python -m http.server 3000
 ```
-Перейдите на http://localhost:3000
+Затем откройте http://localhost:3000
 
-### 📡 API
+## 🧠 ML-модель
+ * Архитектура: классификация на 15 действий (комбинации изменения яркости, контраста, насыщенности).
 
-| Метод |	Эндпоинт	| Описание |
-|-------|---------------|----------|
-| POST	| `/api/tasks`	| Создать задачу (передать файл) |
-| GET	| `/api/tasks/{id}/status` |	Получить статус, прогресс и предсказанные параметры |
-| GET	| `/api/tasks/{id}/result`	| Скачать улучшенное изображение |
-| DELETE |	`/api/tasks/{id}`	| Прервать задачу |
+ * Обучение: на датасете CIFAR-10 с синтетическими искажениями (включая пересвеченные примеры).
 
-API документировано автоматически (Swagger): [http://localhost:8000/docs](http://localhost:8000/docs)
+ * Формат: TensorFlow.js (конвертирована из SavedModel).
 
-### 🧠 ML-модель
-* Архитектура: классификация на 15 действий (комбинации изменения яркости, контраста, насыщенности).
+ * Вход: изображение 128×128 пикселей.
 
-* Обучена на датасете CIFAR-10 с синтетическими искажениями.
+ * Выход: коэффициенты (brightness, contrast, saturation), применяемые через Canvas API.
 
-* Вход: изображение 128×128 пикселей.
+## Ноутбуки Google Colab
+Обучение модели: [открыть в Colab](https://colab.research.google.com/drive/1awmR3FsPO_MayBPQDHhfS6VPPQ7FETaB?usp=sharing)
 
-* Выход: коэффициенты яркости, контраста, насыщенности
+Конвертация в TensorFlow.js: [открыть в Colab](https://colab.research.google.com/drive/1D6JRr4ufSGbbBgeM42FGy6TCOSUxjnvP?usp=sharing)
 
-Модель сохранена в формате SavedModel (папка `backend/enhancer_15class`).
-
-Ноутбук с обучением модели: [открыть в Colab](https://colab.research.google.com/drive/1awmR3FsPO_MayBPQDHhfS6VPPQ7FETaB?usp=sharing)
-
-### 📸 Тестирование
-
-Используйте изображения из папки `samples/` или свои.
-В логах бэкенда отображается предсказанный класс и применённые коэффициенты.
+## 📸 Тестирование
 
 В папке `samples/` вы найдёте примеры фотографий с разными дефектами:
 
@@ -94,9 +87,11 @@ API документировано автоматически (Swagger): [http:/
 
 * `highlighted.jpg` – пересвеченное
 
-### 🛠️ Технологии
-* Backend: FastAPI, TensorFlow 2.15, Pillow
+их можно использовать для проверки
 
-* Frontend: HTML5, CSS3, JavaScript, heic2any
+## 🛠️ Технологии
+ * **Frontend:** HTML5, CSS3, JavaScript (ES6), TensorFlow.js, Canvas API, heic2any
 
-* ML: Keras (TensorFlow)
+ * **ML**: Keras (TensorFlow), конвертация в TensorFlow.js
+
+ * **Хостинг**: GitHub Pages (полностью статический)
