@@ -42,7 +42,7 @@
 ## 📁 Структура репозитория 
 ```bash
 ml-image-enhancer/
-├── frontend/
+├── docs/
 │ ├── index.html # главный интерфейс (TensorFlow.js)
 │ └── tfjs_model/ # конвертированная модель
 │ ├── model.json
@@ -56,7 +56,7 @@ ml-image-enhancer/
 Если вы хотите запустить копию на своём компьютере без интернета:
 
 ```bash
-cd frontend
+cd docs
 python -m http.server 3000
 ```
 Затем откройте http://localhost:3000
