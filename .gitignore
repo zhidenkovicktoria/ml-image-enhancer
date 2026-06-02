@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.so
+venv/
+env/
+.venv/
+
+# Временные файлы проекта
+backend/temp_results/
+*.tmp
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

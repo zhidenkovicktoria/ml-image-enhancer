@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ML Image Enhancer — нейросетевое улучшение</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 1.1rem; }
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 30px;
+        }
+        .panel {
+            flex: 1;
+            min-width: 280px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .panel:hover { transform: translateY(-5px); }
+        .panel h3 {
+            margin-bottom: 20px;
+            color: #333;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            background: #fafafa;
+            cursor: pointer;
+        }
+        input[type="file"]:hover { border-color: #667eea; background: #f0f0ff; }
+        button {
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 8px 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button:hover { background: #5a67d8; transform: scale(1.02); }
+        button:disabled { background: #b0b0b0; cursor: not-allowed; transform: none; }
+        #abortBtn { background: #e53e3e; }
+        #abortBtn:hover { background: #c53030; }
+        .status {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+            text-align: center;
+        }
+        .params-box {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 12px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .params-box span { font-weight: bold; color: #2b6cb0; }
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            width: 0%;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }
+        .preview-container, .result-container {
+            margin-top: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 15px;
+            min-height: 200px;
+        }
+        .preview-container img, .result-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            object-fit: contain;
+        }
+        .placeholder-text { color: #a0aec0; font-style: italic; padding: 40px 0; }
+        .footer {
+            background: #edf2f7;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #4a5568;
+        }
+        @media (max-width: 768px) {
+            .flex { padding: 15px; gap: 15px; }
+            .header h1 { font-size: 1.5rem; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>✨ ML Image Enhancer ✨</h1>
+        <p>Нейросеть автоматически улучшает яркость, контраст и цветность</p>
+    </div>
+
+    <div class="flex">
+        <div class="panel">
+            <h3>📤 1. Загрузите изображение</h3>
+            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/bmp,image/heic,.heic">
+            <div id="preview" class="preview-container">
+                <div class="placeholder-text">⬅️ Здесь появится превью</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>⚙️ 2. Управление</h3>
+            <button id="processBtn">🤖 Запустить ML-обработку</button>
+            <button id="abortBtn" disabled>⏹ Прервать задачу</button>
+            <div class="status" id="statusMsg">Статус: ожидание загрузки</div>
+            <div id="paramsDisplay" class="params-box" style="display: none;">
+                🧠 Параметры улучшения:<br>
+                Яркость: <span id="paramBright">—</span> &nbsp;|&nbsp;
+                Контраст: <span id="paramContrast">—</span> &nbsp;|&nbsp;
+                Насыщенность: <span id="paramSat">—</span>
+            </div>
+            <div class="progress-bar"><div id="progressFill" class="progress-fill">0%</div></div>
+        </div>
+
+        <div class="panel">
+            <h3>🎯 3. Результат</h3>
+            <div id="resultImage" class="result-container">
+                <div class="placeholder-text">✨ Улучшенное изображение появится здесь</div>
+            </div>
+            <button id="downloadBtn" disabled>💾 Скачать улучшенное фото</button>
+        </div>
+    </div>
+    <div class="footer">
+        🧠 ML-модель (свёрточная нейросеть) подбирает оптимальные параметры коррекции
+    </div>
+</div>
+
+<script>
+    let currentTaskId = null;
+    let pollInterval = null;
+
+    const fileInput = document.getElementById('fileInput');
+    const processBtn = document.getElementById('processBtn');
+    const abortBtn = document.getElementById('abortBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const progressFill = document.getElementById('progressFill');
+    const previewDiv = document.getElementById('preview');
+    const resultDiv = document.getElementById('resultImage');
+    const paramsDisplay = document.getElementById('paramsDisplay');
+    const paramBright = document.getElementById('paramBright');
+    const paramContrast = document.getElementById('paramContrast');
+    const paramSat = document.getElementById('paramSat');
+
+    // Конвертация HEIC в JPEG (с отладкой)
+    async function convertHeicIfNeeded(file) {
+        const isHeic = file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic');
+        if (!isHeic) return file;
+        
+        console.log("HEIC файл обнаружен, конвертируем...");
+        try {
+            const blob = await heic2any({ blob: file, toType: 'image/jpeg' });
+            console.log("Конвертация успешна, размер:", blob.size);
+            return new File([blob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' });
+        } catch (e) {
+            console.error("Ошибка конвертации HEIC:", e);
+            alert("Не удалось сконвертировать HEIC файл. Попробуйте другой формат.");
+            return file;
+        }
+    }
+
+    fileInput.addEventListener('change', async (e) => {
+        let file = e.target.files[0];
+        if (!file) return;
+        // Для предпросмотра тоже конвертируем HEIC
+        let displayFile = file;
+        if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+            try {
+                const blob = await heic2any({ blob: file, toType: 'image/jpeg' });
+                displayFile = new File([blob], 'preview.jpg', { type: 'image/jpeg' });
+            } catch (e) { console.warn("Preview HEIC conversion failed", e); }
+        }
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(displayFile);
+        previewDiv.innerHTML = '';
+        previewDiv.appendChild(img);
+        statusMsg.textContent = '✅ Изображение загружено. Нажмите "Запустить ML-обработку"';
+        // Скрыть параметры до новой обработки
+        paramsDisplay.style.display = 'none';
+    });
+
+    async function processImage() {
+        let file = fileInput.files[0];
+        if (!file) {
+            alert('Сначала выберите изображение');
+            return;
+        }
+        // Конвертируем HEIC перед отправкой
+        file = await convertHeicIfNeeded(file);
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('use_ml', 'true');
+
+        statusMsg.textContent = '🚀 Отправка задачи на сервер...';
+        progressFill.style.width = '0%';
+        progressFill.textContent = '0%';
+        paramsDisplay.style.display = 'none';
+
+        try {
+            const response = await fetch('http://localhost:8000/api/tasks', { method: 'POST', body: formData });
+            const data = await response.json();
+            currentTaskId = data.task_id;
+            statusMsg.textContent = `🆔 Задача ${currentTaskId.slice(0,8)} создана. Нейросеть анализирует...`;
+            processBtn.disabled = true;
+            abortBtn.disabled = false;
+            downloadBtn.disabled = true;
+
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(checkStatus, 1000);
+        } catch (error) {
+            statusMsg.textContent = '❌ Ошибка: ' + error.message;
+        }
+    }
+
+    async function checkStatus() {
+        if (!currentTaskId) return;
+        try {
+            const res = await fetch(`http://localhost:8000/api/tasks/${currentTaskId}/status`);
+            const data = await res.json();
+            const pct = data.progress || 0;
+            progressFill.style.width = pct + '%';
+            progressFill.textContent = pct + '%';
+            statusMsg.textContent = `⏳ Статус: ${data.status} (${pct}%)`;
+
+            // Отображаем параметры, если они пришли (brightness, contrast, saturation)
+            if (data.brightness !== undefined && data.contrast !== undefined && data.saturation !== undefined) {
+                paramBright.textContent = data.brightness.toFixed(2);
+                paramContrast.textContent = data.contrast.toFixed(2);
+                paramSat.textContent = data.saturation.toFixed(2);
+                paramsDisplay.style.display = 'block';
+            }
+
+            if (data.status === 'completed') {
+                clearInterval(pollInterval);
+                statusMsg.textContent = '🎉 Готово! Результат можно скачать.';
+                processBtn.disabled = false;
+                abortBtn.disabled = true;
+                downloadBtn.disabled = false;
+                const img = document.createElement('img');
+                img.src = `http://localhost:8000/api/tasks/${currentTaskId}/result?t=${Date.now()}`;
+                resultDiv.innerHTML = '';
+                resultDiv.appendChild(img);
+            } else if (data.status === 'failed') {
+                clearInterval(pollInterval);
+                statusMsg.textContent = `❌ Ошибка: ${data.error}`;
+                processBtn.disabled = false;
+                abortBtn.disabled = true;
+            } else if (data.status === 'aborted') {
+                clearInterval(pollInterval);
+                statusMsg.textContent = '⏸ Задача прервана';
+                processBtn.disabled = false;
+                abortBtn.disabled = true;
+            }
+        } catch (error) {
+            console.error('Status check error:', error);
+        }
+    }
+
+    async function abortTask() {
+        if (!currentTaskId) return;
+        try {
+            await fetch(`http://localhost:8000/api/tasks/${currentTaskId}`, { method: 'DELETE' });
+            statusMsg.textContent = '⏸ Задача прервана';
+            clearInterval(pollInterval);
+            processBtn.disabled = false;
+            abortBtn.disabled = true;
+            downloadBtn.disabled = true;
+        } catch (error) {
+            statusMsg.textContent = '❌ Ошибка при прерывании';
+        }
+    }
+
+    function downloadResult() {
+        if (currentTaskId) {
+            window.open(`http://localhost:8000/api/tasks/${currentTaskId}/result`, '_blank');
+        }
+    }
+
+    processBtn.onclick = processImage;
+    abortBtn.onclick = abortTask;
+    downloadBtn.onclick = downloadResult;
+</script>
+</body>
+</html>
