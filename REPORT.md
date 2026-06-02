@@ -44,6 +44,6 @@ ML-модель для улучшения изображений (яркость
 ## Ссылки
 
 - **Репозиторий:** https://github.com/ваш_логин/ml-image-enhancer
-- **Демо:** https://zhidenkovicktoria.github.io/ml-image-enhancer/frontend/
+- **Демо:** https://zhidenkovicktoria.github.io/ml-image-enhancer/
 - **Colab-ноутбук с обучением:** https://colab.research.google.com/drive/1awmR3FsPO_MayBPQDHhfS6VPPQ7FETaB?usp=sharing
 - **Colab-ноутбук с обучением: Конвертация в TensorFlow.js:** https://colab.research.google.com/drive/1D6JRr4ufSGbbBgeM42FGy6TCOSUxjnvP?usp=sharing

@@ -205,7 +205,7 @@
     async function loadModel() {
         try {
             statusMsg.textContent = 'Статус: загрузка модели TF.js...';
-            model = await tf.loadGraphModel('/tfjs_model/model.json');
+            model = await tf.loadGraphModel('tfjs_model/model.json');
             statusMsg.textContent = 'Статус: модель готова. Загрузите изображение.';
             processBtn.disabled = false;
             processBtn.textContent = '🤖 Запустить улучшение';
